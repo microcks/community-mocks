@@ -3,7 +3,7 @@ kind: APIVersion
 metadata:
   name: account-and-transaction.3.1.0
   displayName: Read/Write API - Accound and Transaction
-  createdAt: 2021-04-09 09:01:00
+  createdAt: '2021-04-09T09:01:00.000Z'
   description: 'The Account and Transaction API Profile describes the flows and 
     common functionality for the Accounts and Transaction API, which allows an 
     Account Information Service Provider (AISP) to:
