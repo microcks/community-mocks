@@ -3,7 +3,7 @@
   "$id": "https://hub.microcks.io/schemas/APIPackage-v1alpha1-schema.json",
   "type": "object",
   "title": "The APIPackage root schema",
-  "description": "APIPackage is package/bundle of coherent API versions",
+  "description": "APIPackage is a package/bundle of coherent API versions",
   "required": [
     "apiVersion",
     "kind",
@@ -34,12 +34,12 @@
         "name",
         "displayName",
         "categories",
-        "certified",
+        "provider",
+        "source",
         "createdAt",
         "updatedAt",
         "description",
-        "icon",
-        "provider"
+        "icon"
       ],
       "properties": {
         "name": {
@@ -69,12 +69,41 @@
             "Banking"
           ]
         },
-        "certified": {
-          "$id": "#/properties/metadata/properties/certified",
-          "type": "boolean",
+        "source": {
+          "$id": "#/properties/metadata/properties/source",
+          "type": "string",
           "title": "Is this package certified?",
           "description": "Whether this APIPackage has a certification.",
-          "default": "false"
+          "enum": ["Community", "Enterprise"],
+          "examples": [
+            "Community"
+          ]
+        },
+        "provider": {
+          "$id": "#/properties/metadata/properties/provider",
+          "type": "object",
+          "title": "The provider of package",
+          "description": "The description of APIPackage provider.",
+          "examples": [
+            {
+              "name": "MicrocksIO"
+            }
+          ],
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "$id": "#/properties/metadata/properties/provider/properties/name",
+              "type": "string",
+              "title": "The name of package provider",
+              "description": "The name of this APIPackage provider",
+              "examples": [
+                "MicrocksIO"
+              ]
+            }
+          },
+          "additionalProperties": false
         },
         "createdAt": {
           "$id": "#/properties/metadata/properties/createdAt",
@@ -143,32 +172,6 @@
             },
             "additionalProperties": false
           }
-        },
-        "provider": {
-          "$id": "#/properties/metadata/properties/provider",
-          "type": "object",
-          "title": "The provider of package",
-          "description": "The description of APIPackage provider.",
-          "examples": [
-            {
-              "name": "MicrocksIO"
-            }
-          ],
-          "required": [
-            "name"
-          ],
-          "properties": {
-            "name": {
-              "$id": "#/properties/metadata/properties/provider/properties/name",
-              "type": "string",
-              "title": "The name of package provider",
-              "description": "The name of this APIPackage provider",
-              "examples": [
-                "MicrocksIO"
-              ]
-            }
-          },
-          "additionalProperties": false
         }
       },
       "additionalProperties": false
@@ -198,7 +201,7 @@
           "$id": "#/properties/spec/properties/description",
           "type": "string",
           "title": "The description of package content",
-          "description": "A long description (formatted in Markdoxwn) explaining APIPackage content.",
+          "description": "A long description (formatted in Markdown) explaining APIPackage content.",
           "examples": [
             "\nThe Open Banking API Specifications consist of 5 distinct types of specifications.\nThese include Read/Write API Specifications, Open Data API Specifications, Directory\nSpecifications, Dynamic Client Registration Specifications and finally MI Reporting\nSpecifications.\n\n* **Read/Write API Specifications** describe a collection of RESTful APIs that enable\nTPPs to access information and initiate payments for customers, by connecting to ASPSPs\n– securely, efficiently, and with customer consent.\n\n* **Open Data API Specifications** allow API providers (e.g. banks, building societies\nand ATM providers) to develop API endpoints which can then be accessed by API users\n(e.g. third party developers) to build mobile and web applications for banking customers.\n\n* **Directory Specifications** detail technical information on how the Open Banking\nDirectory works, and the roles and functions of each participant in the Directory.\n\n* **Dynamic Client Registration (DCR) Specifications** define the APIs for TPPs to\nsubmit Software Statement Assertions to ASPSPs for the purpose of creating OAuth clients\nthat are registered with ASPSPs.\n\n* **MI Reporting Specifications** for MI Reporting of ASPSPs to Open Banking. MI\nspecification includes detailed Data Dictionary and examples of MI reporting template.\n"
           ]

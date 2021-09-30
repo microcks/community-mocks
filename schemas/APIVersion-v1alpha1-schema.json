@@ -128,7 +128,6 @@
         "capabilities",
         "contracts",
         "links",
-        "provider",
         "maintainers",
         "keywords"
       ],
@@ -146,8 +145,8 @@
           "$id": "#/properties/spec/properties/capabilities",
           "type": "string",
           "title": "The capability level of API version",
-          "description": "Express a level of completion and thus capability of an API version artifacts and contracts",
-          "enum": ["Incomplete Mocks"],
+          "description": "Express a level of completion and so capabilities of an API version artifacts and contracts",
+          "enum": ["Incomplete Mocks", "Full Mocks", "Mocks + Assertions"],
           "examples": [
             "Incomplete Mocks"
           ]
@@ -186,7 +185,7 @@
                 "type": "string",
                 "title": "The type of the contract of API version",
                 "description": "The contract/artifact type for defining API version.",
-                "enum": ["openapi", "asyncapi", "grpc", "postman", "soapui"],
+                "enum": ["openapi", "asyncapi", "grpc", "postman", "soapui", "microcks-metadata"],
                 "examples": [
                   "postman"
                 ]
@@ -249,30 +248,6 @@
             "additionalProperties": false
           }
         },
-        "provider": {
-          "$id": "#/properties/spec/properties/provider",
-          "type": "object",
-          "title": "The provider of this API version",
-          "description": "Represents the provider information of this APIVersion.",
-          "default": {},
-          "examples": [
-            {
-              "name": "Laurent Broudoux"
-            }
-          ],
-          "required": [
-            "name"
-          ],
-          "properties": {
-            "name": {
-              "$id": "#/properties/spec/properties/provider/properties/name",
-              "type": "string",
-              "title": "The name of the provider",
-              "description": "The provider's name for this APIVersion."
-            }
-          },
-          "additionalProperties": true
-        },
         "maintainers": {
           "$id": "#/properties/spec/properties/maintainers",
           "type": "array",
@@ -281,7 +256,7 @@
           "examples": [
             [
               {
-                "email": "laurent.broudoux@gmail.com",
+                "email": "laurent@microcks.io",
                 "name": "Laurent Broudoux"
               }
             ]
@@ -290,10 +265,10 @@
             "$id": "#/properties/spec/properties/maintainers/items",
             "type": "object",
             "title": "A maintainer item",
-            "description": "Mainteainer of APIVersion has a name and email.",
+            "description": "Maintainer of APIVersion has a name and email.",
             "examples": [
               {
-                "email": "laurent.broudoux@gmail.com",
+                "email": "laurent@microcks.io",
                 "name": "Laurent Broudoux"
               }
             ],
