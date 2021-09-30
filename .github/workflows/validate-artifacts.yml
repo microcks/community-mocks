@@ -1,0 +1,54 @@
+name: Validate Artifacts on PR
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-artiffacts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install Utils
+        run: |
+          sudo apt install jq snapd -y
+          sudo snap install yq
+          npm install -g ajv-cli ajv-formats
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Filter artifacts
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            artifacts:
+              - 'artifacts/**'
+      - name: Get changed files
+        if: steps.changes.outputs.artifacts == 'true'
+        uses: jitterbit/get-changed-files@v1
+        id: files
+
+      - name: Validate changed files
+        if: steps.changes.outputs.artifacts == 'true'
+        run: |
+          for changed_file in ${{ steps.files.outputs.all }}; do
+            echo "Processing ${changed_file}..."
+            depth=$(echo "$changed_file" | awk -F/ '{print NF-1}')
+            if [ $depth = "2" ]
+            then
+              echo "  Validating it as an API package..."
+              .github/scripts/validate-package.sh $changed_file
+            elif [ $depth = "4" ]
+            then
+              echo "  Validating it as an API version..."
+              .github/scripts/validate-apiVersion.sh $changed_file
+            else
+              echo "  Nothing to do with this one..."
+            fi
+          done
