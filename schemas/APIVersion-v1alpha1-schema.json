@@ -185,7 +185,7 @@
                 "type": "string",
                 "title": "The type of the contract of API version",
                 "description": "The contract/artifact type for defining API version.",
-                "enum": ["openapi", "asyncapi", "grpc", "postman", "soapui", "microcks-metadata"],
+                "enum": ["openapi", "asyncapi", "grpc", "graphql", "postman", "soapui", "microcks-metadata"],
                 "examples": [
                   "postman"
                 ]
