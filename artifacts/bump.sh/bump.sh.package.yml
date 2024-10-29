@@ -1,0 +1,40 @@
+apiVersion: mocks.microcks.io/v1alpha1
+kind: APIPackage
+metadata:
+  name: bump.sh
+  displayName: Bump.sh APIs
+  categories: Transportation
+  source: Community
+  provider:
+    name: Bump.sh
+  createdAt: '2024-10-29 17:00:00'
+  updatedAt: '2024-10-29 17:00:00'
+  description: 
+  icon:
+    - base64data: iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAACZUlEQVR4nOzXy2sTQRwH8NlH0hLRutYeugQiHgJBcIN4SAJpbhVqwP/AgwfBQwVrG9GKUMGTioo3e1FvPg4BKxjIyRwitehBMSJUSGzDmlAHa2v3kZ0R2uBmQ+wMtRktzPeSZPa3mU92Jvlt5P79A+B/ivivAe3hIFI4iBQOIoWDSOEgUmRihaZpx4aH2wYbTqNU+pjP523b7ngW3jOIDyZRzz7w7YtUKQjm8raBotFoJjPR8VC1Wp3IXMjlcp5RQQQjF/HRk8gCjmGjtYa5suKbvev/9IgG9FdLpqrqwwf347GYx3PiChg6DcT1j4rXh+Re48g5M5TuOggAIEmS5/oNHBBTp1p07lPj0Bks+rsOAgAkEoldgUATEB0BouQewy4L+/vs/igLkCRJexWlCdq9ye0exn6FBcg0zXq93pxzqdJJsvEgiGs6C9CLXM6yrObUb59j82cLomWm1QUZvu86CEI4NXXVfb1cQ08nAfZyBAAcK/DmmoCd7oJez80dT6crFe8yzT4GT8aB+cNdqlU9UBiXl97RvKdA/NcRCoU0TWsbRMiZn/9cKpX+dBaWe7F6GPf0Cd91of6B5trQghhnBzbXcDjc1hzo4yC0uLhQLL4yDGPbQPF4/OaN61sDbQRCODZ2/tnMDE0xiyVTFGV6+l4qlaIpZrSHZFm+c/uWz+cjVrLb1MFgMEaxF5l+y1R1kFjDFKTrX4k17EC1Wq1YLBLL2IEuTV7+fVOwSViAIISjo2ez2SxNMbmXRSKRoWRyaxSEULlcflko0P9S8+ZKCgeRwkGkcBApHEQKB5HyKwAA//8dEMgpImCtowAAAABJRU5ErkJggg==
+      mediatype: image/png
+spec:
+  maturity: beta
+  description: |
+    ### What is Bump.sh?
+
+    Bump.sh helps you build a branded single source of truth, documenting and
+    cataloging all your APIs. Teams and customers now have a reference point for
+    building and consuming APIs whether with OpenAPI, Swagger or AsyncAPI.
+
+    ### Stunning documentation
+
+    Designed with Developer Experience in mind: we make sure your readers will
+    enjoy every bit of your technical content. Blazing fast load times, sleek
+    user interface, single-page experience, easy sharing & highlighting,
+    generated examples. 
+
+    ### API changes are automatically detected
+
+    Collaborate directly from GitHub, Gitlab or Bitbucket. Get the best of
+    automation while keeping control of your changelog: Bump.sh detects and
+    summarizes changes for you. You decide when to publish them to your users. 
+
+  apis:
+    - name: train-travel
+      currentVersion: '1.0'
