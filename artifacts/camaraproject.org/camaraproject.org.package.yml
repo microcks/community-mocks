@@ -48,8 +48,8 @@ spec:
     * To support application portability
   apis:
     - name: know-your-customer-match
-      currentVersion: '0.1.0-rc'
+      currentVersion: '0.3.0'
     - name: quality-on-demand
-      currentVersion: '0.10.0'
+      currentVersion: '1.0.0'
     - name: sim-swap
-      currentVersion: '0.5.0-wip'
+      currentVersion: '2.0.0'
