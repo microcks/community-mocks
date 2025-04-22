@@ -45,4 +45,4 @@ spec:
 
   apis:
     - name: train-travel
-      currentVersion: '1.0'
+      currentVersion: '1.2.0'
