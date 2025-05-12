@@ -39,6 +39,8 @@ metadata:
 
     - POST check: Checks if SIM swap has been performed during a past period (defined in the request with 'maxAge' attribute) for a given phone number.
 
+    NOTE: The phone numbers used for the mocks are randomly generated from https://dialaxy.com/lookups/phone-number-generator/
+
     # Authorization and authentication
 
     The "Camara Security and Interoperability Profile" provides details of how an API consumer requests an access token. Please refer to Identity and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the released version of the profile.
