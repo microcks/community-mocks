@@ -1,0 +1,90 @@
+apiVersion: mocks.microcks.io/v1alpha1
+kind: APIVersion
+metadata:
+  name: device-reachability-status.1.0.0
+  displayName: Device Reachability Status
+  createdAt: '2024-03-18T09:54:00.000Z'
+  description: |
+    This API provides the API consumer with the ability to query device reachability status.
+
+    # Introduction
+
+    ## Reachability Status
+
+    API consumer is able to verify whether a certain user device is reachable from the network via data- or sms-usage.
+
+    ## Relevant terms and definitions
+
+    * **Device**: A device refers to any physical entity that can connect to a network and participate in network communication.
+      At least one identifier for the device (user equipment) out of four options: IPv4 address, IPv6 address, Phone number, or Network Access Identifier (not supported for this API version) assigned by the mobile network operator for the device.
+
+    * **Reachable:** Indicates, if the device is reachable from the network or not.
+
+    * **Connectivity:** Indicates the connectivity types (DATA, SMS or both) through which the device is reachable from the network.
+
+    * **LastStatusTime** : This property specifies the time when the status was last updated. Its presence in the response indicates the freshness of the information, while its absence implies the information may be outdated or its freshness is uncertain.
+
+    # API Functionality
+
+    The API exposes following capabilities:
+
+    ### Device Reachability situation
+
+    The endpoint `POST /retrieve` allows to get current connectivity status information synchronously.
+
+    # Identifying the device from the access token
+
+    This API requires the API consumer to identify a device as the subject of the API as follows:
+    - When the API is invoked using a two-legged access token, the subject will be identified from the optional `device` object, which therefore MUST be provided.
+    - When a three-legged access token is used however, this optional identifier MUST NOT be provided, as the subject will be uniquely identified from the access token.
+
+    This approach simplifies API usage for API consumers using a three-legged access token to invoke the API by relying on the information that is associated with the access token and was identified during the authentication process.
+
+    ## Error handling:
+
+    - If the subject cannot be identified from the access token and the optional `device` object is not included in the request, then the server will return an error with the `422 MISSING_IDENTIFIER` error code.
+
+    - If the subject can be identified from the access token and the optional `device` object is also included in the request, then the server will return an error with the `422 UNNECESSARY_IDENTIFIER` error code. This will be the case even if the same device is identified by these two methods, as the server is unable to make this comparison.
+
+    # Authorization and authentication
+
+    The "Camara Security and Interoperability Profile" provides details of how an API consumer requests an access token. Please refer to Identity and Consent Management (https://github.com/camaraproject/IdentityAndConsentManagement/) for the released version of the profile.
+
+    The specific authorization flows to be used will be agreed upon during the onboarding process, happening between the API consumer and the API provider, taking into account the declared purpose for accessing the API, whilst also being subject to the prevailing legal framework dictated by local legislation.
+
+    In cases where personal data is processed by the API and users can exercise their rights through mechanisms such as opt-in and/or opt-out, the use of three-legged access tokens is mandatory. This ensures that the API remains in compliance with privacy regulations, upholding the principles of transparency and user-centric privacy-by-design.
+
+    ## Multi-SIM scenario handling
+
+    In multi-SIM scenarios where more than one mobile device is associated with a phone number (e.g. a smartphone with an associated smartwatch), it might not be possible to uniquely identify the device for which the reachability status should be returned from that phone number. If the phone number is used as the device identifier when querying in a multi-SIM scenario, the API may:
+    - respond with an error, or
+    - return a combined reachability status for the multi-SIM group as a whole, or
+    - return the reachability status for a single device in the multi-SIM group, which may not be the intended device.
+
+    Possible solutions in such a scenario include:
+    - Using the authorisation code flow to obtain an access token, which will automatically identify the intended device
+    - Identifying the intended device from a unique identifier for that device, such as its source IP address and port
+    - Check with the SIM provider whether a unique "secondary" phone number is already associated with each device, and use the secondary phone number to identify the intended device if available.
+
+    ## Further info and support
+
+    (FAQs will be added in a later version of the documentation)
+  icon:
+    - base64data: iVBORw0KGgoAAAANSUhEUgAAAEoAAABKCAYAAAAc0MJxAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFGmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNi4wLWMwMDYgNzkuMTY0NzUzLCAyMDIxLzAyLzE1LTExOjUyOjEzICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjIuMyAoTWFjaW50b3NoKSIgeG1wOkNyZWF0ZURhdGU9IjIwMjItMTAtMTRUMTE6MzQ6NDItMDQ6MDAiIHhtcDpNb2RpZnlEYXRlPSIyMDIyLTEwLTE0VDExOjM1OjMxLTA0OjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDIyLTEwLTE0VDExOjM1OjMxLTA0OjAwIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyIgcGhvdG9zaG9wOklDQ1Byb2ZpbGU9InNSR0IgSUVDNjE5NjYtMi4xIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOmIxZDI0ZDNiLTQ5YWUt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
+      mediatype: image/png
+spec:
+  version: "1.0.0"
+  capabilities: Incomplete Mocks
+  contracts:
+    - type: openapi
+      url: https://github.com/camaraproject/DeviceStatus/blob/r2.2/code/API_definitions/device-reachability-status.yaml
+  links:
+    - name: CamaraProject.org mocks repository
+      url: https://github.com/microcks/microcks-quickstarters
+  maintainers:
+    - email: laurent@microcks.io
+      name: Laurent Broudoux
+  keywords:
+    - camara
+    - 5g
+    - sim
