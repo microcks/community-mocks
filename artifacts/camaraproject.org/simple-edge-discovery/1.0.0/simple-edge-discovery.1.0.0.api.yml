@@ -1,0 +1,266 @@
+apiVersion: mocks.microcks.io/v1alpha1
+kind: APIVersion
+metadata:
+  name: simple-edge-discovery.1.0.0
+  displayName: Simple Edge Discovery
+  createdAt: '2024-03-18T09:54:00.000Z'
+  description: |
+    # Find the closest Edge Cloud Zone
+    ---
+    # Summary
+
+    The Simple Edge Discovery API returns the name of the closest operator Edge
+    Cloud Zone to a particular user device.
+
+    # Purpose
+    Network operators may host multiple Edge Cloud Zones in a
+    given territory. Connecting your application to a server on the closest
+    Edge Cloud Zone means packets travel the shortest distance between
+    endpoints, typically resulting in the lowest round-trip latency. Note, the
+    physical (GPS) location of a user device is not a reliable way to determine
+    the closest Edge Cloud Zone, due to the way operator networks are routed -
+    so the operator will calculate the Edge Cloud Zone with the
+    _shortest network path_to the network-attached device identified in the API
+    request.
+
+    Once you have the name of the closest Edge Cloud Zone to the user device,
+    you may:
+
+    * connect the application client on the user device to your application
+    server instance on that Edge Cloud Zone. Note: the address of that server
+    instance is not part of the API response, but should be known in advance.
+    * or, if you have no instance on that Edge Cloud Zone, you may wish to
+    deploy one there.
+
+    Note: the provider of the Edge Cloud Zone may be an operator, or a cloud
+    provider working in partnership with the operator.
+
+    # Usage
+
+    The API may be called either by an application client hosted on a device
+    attached to the operator network (i.e. phone, tablet), or by a server.
+
+    There is a single API endpoint: `/edge-cloud-zones?filter=closest`. To call
+    this endpoint, the API consumer must first obtain a valid OAuth2 token from
+    the token endpoint, and pass it as an `Authorization` header in the API
+    request.
+
+    # Identifying the device
+
+    The API returns the closest Edge Cloud Zone to a given device, so that
+    device needs to be identifiable by the network. This can be achieved either
+    by passing a device identifier in the request header, or, from the 3-legged
+    access token where implemented by the operator.
+
+    ## Passing a device identifier in the request header
+
+    * If you call the API from a server, you must explicitly pass one or
+    more device identifiers in the HTTP request header:
+      * `IPv4-Address` or `IPv6-Address`. This is the public IP address of the
+      user device: this
+      can be obtained by an application hosted on that device calling a
+      public IP address API (e.g. GET https://api.ipify.org?format=json)
+      * If you provide an `IPv4-Address` or `IPv6-Address`: for certain
+      operators you may be required to also provide a `Public-port` header.
+      * `Phone-Number` . The international E.164 format (starting with country
+      code), e.g. +4407123123456
+      * `Network-Access-Identifier` (where available from the API host operator)
+
+    * If you call the API from a device attached to the operator network, then
+    you can attempt the request without passing device identifier(s) parameters
+    in the request header. If that returns a 422 `UNIDENTIFIABLE_DEVICE`
+    error then retry the request but this time include a device identifier.
+
+    NOTE1: the network operator might support only a subset of these options.
+    The API invoker can provide multiple identifiers to be compatible across
+    different network operators. In this case the identifiers MUST belong to the
+    same device.
+
+    NOTE2: for the Commonalities release v0.4, we are enforcing that the
+    `networkAccessIdentifier` is only part of the schema for future-proofing, and
+    CAMARA does not currently allow its use. After the CAMARA meta-release work
+    is concluded and the relevant issues are resolved, its use will need to be
+    explicitly documented in the guidelines.
+
+    ### Example requests:
+
+    Examples for all API clients:
+    ```
+      GET /edge-cloud-zones?filter=closest HTTP/1.1
+      Host: example.com
+      Accept: application/json
+      IPv4-Address: 84.125.93.10
+
+      GET /edge-cloud-zones?filter=closest HTTP/1.1
+      Host: example.com
+      Accept: application/json
+      Phone-Number: +441234567890
+    ```
+    Example where the network operator requires the public port to be passed:
+    ```
+      GET /edge-cloud-zones?filter=closest HTTP/1.1
+      Host: example.com
+      Accept: application/json
+      IPv4-Address: 84.125.93.10
+      Public-port: 1234
+    ```
+
+    Example where API client is on a network-attached device:
+    ```
+      GET /edge-cloud-zones?filter=closest HTTP/1.1
+      Host: example.com
+      Accept: application/json
+    ```
+
+    ## Identifying a device from the access token
+
+    This specification defines the `device` identifying headers as optional in
+    API requests, specifically in cases where the API is accessed using a
+    3-legged access token and the device can be uniquely identified by the token.
+    This approach simplifies API usage for API consumers by relying on the device
+    information associated with the access token used to invoke the API.
+
+    ### Handling of device information:
+
+    #### Optional device identifying headers for 3-legged tokens:
+
+    - When using a 3-legged access token, the device associated with the access
+      token must be considered as the device for the API request. This means that
+      a device  identifying header  is not required in the request, and if
+      included it must identify the same device, therefore **it is recommended
+      NOT to include it in these scenarios** to simplify the API usage and avoid
+      additional validations.
+
+    #### Validation mechanism:
+
+    - The server will extract the device identification from the access token, if
+      available.
+    - If the API request additionally includes a `device`  identifying header
+      when using a 3-legged access token, the API will validate that the device
+      identifier provided matches the one associated with the access token.
+    - If there is a mismatch, the API will respond with a
+      403 `INVALID_TOKEN_CONTEXT` error, indicating that the device information
+      in the request does not match the token.
+
+    #### Error handling for unidentifiable devices:
+
+    - If the `device`  identifying header is not included in the request and the
+      device information cannot be derived from the 3-legged access token, nor
+      inferred by the operator if the request is made directly from the client,
+      the server will return a 422 `UNIDENTIFIABLE_DEVICE` error.
+
+    #### Restrictions for tokens without an associated authenticated identifier:
+
+    - For scenarios which do not have a single device identifier associated to
+      the token during the authentication flow, e.g. 2-legged access tokens, a
+      `device` identifying header MUST be provided in the API request. This
+      ensures that the device identification is explicit and valid for each API
+      call made with these tokens.
+
+    # Responses
+
+    ## Success
+
+    A JSON object is returned containing an array with a single member object.
+    This contains identifiers for the closest Edge Cloud Zone. The HTTP status
+    code will be`200 OK`. An example response:
+
+    ```
+    [
+      {
+        "edgeCloudZoneId": "4gt555-6457-7890-d4he-1dc79f44gb66",
+        "edgeCloudZoneName": "example zone name",
+        "edgeCloudProvider": "example zone provider"
+      }
+    ]
+    ```
+    * `edgeCloudZoneId` is a UUID for the Edge Cloud Zone.
+    * `edgeCloudZoneName` is the common name of the closest Edge Cloud Zone to
+    the user device.
+    * `edgeCloudProvider` is the name of the operator or cloud provider of
+    the Edge Cloud Zone.
+
+    ## Errors
+
+    If the authentication token is not valid, a `401 UNAUTHENTICATED` error is
+    returned.
+
+    If the mobile subscription parameters contain a formatting error, a `400
+    INVALID_ARGUMENT` error is returned.
+
+    If the mobile subscription cannot be identified from the provided
+    parameters, a `404 NOT_FOUND` error is returned.
+
+    Any more general service failures will result in an error in the `5xx`range
+    with an explanation.
+
+    # Notes for Simple Edge Discovery API publishers
+
+    If an `IPv4-Address` or `IPv6-Address` header parameter is provided then the
+    operator should
+    assume the request is coming from a developer's server rather than a device
+    attached to the network. In which case the developer server is expected to
+    have been provided with the device public IP address (e.g. by the
+    application client on that device signalling it back to the server).
+
+    If neither an `IPv4-Address`/`IPv6-Address` parameter, nor any other device
+    identifier,  is
+    provided in the API request header then the operator should assume the
+    request is from a device attached to their network, and attempt to use the
+    public IP source address to determine which packet gateway issued it (and
+    hence the closest edge to that gateway).
+
+    If no `IPv4-Address`/`IPv6-Address` header parameter is provided, but another
+    device
+    identifier(s) is provided, then the operator should assume the request is
+    coming from a device attached to their network and should make use of one
+    or both of the public IP source address (from the IP packet header) and the
+    device identifier(s) provided in the HTTPS request header.
+
+    Should your implementation require the `Port` value to be passed in addition
+    to the `IP-Address`, please make that explicit in the documentation, and
+    utilise the `GENERIC_400_MISSING_PORT` error if the `Port` header is omitted.
+
+    # Authorization and authentication
+
+    The "Camara Security and Interoperability Profile" provides details on how a
+    client requests an access token. Please refer to Identify and Consent
+    Management (https://github.com/camaraproject/IdentityAndConsentManagement/)
+    for the released version of the Profile.
+
+    Which specific authorization flows are to be used will be determined during
+    onboarding process, happening between the API Client and the Telco Operator
+    exposing the API, taking into account the declared purpose for accessing
+    the API, while also being subject to the prevailing legal framework
+    dictated by local legislation.
+
+    It is important to remark that in cases where personal user data is
+    processed by the API, and users can exercise their rights through
+    mechanisms such as opt-in and/or opt-out, the use of 3-legged access tokens
+    becomes mandatory. This measure ensures that the API remains in strict
+    compliance with user privacy preferences and regulatory obligations,
+    upholding the principles of transparency and user-centric data control.
+
+    # Further info and support
+
+    ---
+    
+  icon:
+    - base64data: iVBORw0KGgoAAAANSUhEUgAAAEoAAABKCAYAAAAc0MJxAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFGmlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNi4wLWMwMDYgNzkuMTY0NzUzLCAyMDIxLzAyLzE1LTExOjUyOjEzICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjIuMyAoTWFjaW50b3NoKSIgeG1wOkNyZWF0ZURhdGU9IjIwMjItMTAtMTRUMTE6MzQ6NDItMDQ6MDAiIHhtcDpNb2RpZnlEYXRlPSIyMDIyLTEwLTE0VDExOjM1OjMxLTA0OjAwIiB4bXA6TWV0YWRhdGFEYXRlPSIyMDIyLTEwLTE0VDExOjM1OjMxLTA0OjAwIiBkYzpmb3JtYXQ9ImltYWdlL3BuZyIgcGhvdG9zaG9wOkNvbG9yTW9kZT0iMyIgcGhvdG9zaG9wOklDQ1Byb2ZpbGU9InNSR0IgSUVDNjE5NjYtMi4xIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOmIxZDI0ZDNiLTQ5YWUt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
+      mediatype: image/png
+spec:
+  version: "1.0.0"
+  capabilities: Incomplete Mocks
+  contracts:
+    - type: postman
+      url: https://github.com/camaraproject/SimpleEdgeDiscovery/blob/r1.3/code/API_definitions/simple-edge-discovery.yaml
+  links:
+    - name: CamaraProject.org mocks repository
+      url: https://github.com/microcks/microcks-quickstarters
+  maintainers:
+    - email: laurent@microcks.io
+      name: Laurent Broudoux
+  keywords:
+    - camara
+    - 5g
+    - sim
